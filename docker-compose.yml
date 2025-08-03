@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # Development server
+  pomodoro-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "8081:8081"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+    command: npm run start
+    profiles:
+      - dev
+
+  # Production web server
+  pomodoro-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    profiles:
+      - prod
+
+  # Production standalone build
+  pomodoro-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production-standalone
+    volumes:
+      - ./dist:/app/dist
+    profiles:
+      - build 
